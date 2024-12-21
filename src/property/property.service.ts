@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Property, PropertyStatus } from './property.types';
 import { v4 as uuid } from 'uuid';
+import {
+  CreateNewPropertyDto,
+  GetPropertyByIdDTO,
+  UpdatePropertyStatusDTO,
+} from './dtos/property.dtos';
 
 @Injectable()
 export class PropertyService {
@@ -10,11 +15,11 @@ export class PropertyService {
     return this.properties;
   }
 
-  getPropertyById(propertyId: string) {
+  getPropertyById({ id: propertyId }: GetPropertyByIdDTO) {
     return this.properties.find(({ id }) => propertyId === id);
   }
 
-  createNewProperty(property: Property): Property {
+  createNewProperty(property: CreateNewPropertyDto): Property {
     const { name, year } = property;
     const newProperty: Property = {
       id: uuid(),
@@ -24,5 +29,11 @@ export class PropertyService {
     };
     this.properties.push(newProperty);
     return newProperty;
+  }
+
+  updatePropertyStatus({ id, status }: UpdatePropertyStatusDTO) {
+    const property = this.getPropertyById({ id });
+    property.status = status;
+    return property;
   }
 }

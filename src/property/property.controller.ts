@@ -1,6 +1,21 @@
-import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { PropertyService } from './property.service';
 import { Property } from './property.types';
+import {
+  CreateNewPropertyDto,
+  GetPropertyByIdDTO,
+  UpdatePropertyStatusDTO,
+} from './dtos/property.dtos';
 
 @Controller('property')
 export class PropertyController {
@@ -12,13 +27,24 @@ export class PropertyController {
   }
 
   @Get('/:id')
-  getPropertyById(@Param('id') id: string): Property {
-    return this.propertyService.getPropertyById(id);
+  @UsePipes(new ValidationPipe({ transform: true }))
+  getPropertyById(@Param() { id }: GetPropertyByIdDTO): Property {
+    return this.propertyService.getPropertyById({ id });
   }
 
   @Post('/create')
   @HttpCode(201)
-  createNewProperty(@Body() property: Property): Property {
+  @UsePipes(new ValidationPipe({ transform: true }))
+  createNewProperty(@Body() property: CreateNewPropertyDto): Property {
     return this.propertyService.createNewProperty(property);
+  }
+
+  @Patch('/:id/status')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  updatePropertyStatus(
+    @Param('id') id: string,
+    @Body() { status }: UpdatePropertyStatusDTO,
+  ) {
+    return this.propertyService.updatePropertyStatus({ id, status });
   }
 }
