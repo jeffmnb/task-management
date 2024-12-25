@@ -3,6 +3,7 @@ import { ZodError, ZodSchema, ZodType } from 'zod';
 
 export class ZodValidationPipe implements PipeTransform {
   constructor(private schema: ZodSchema) {}
+
   transform(value: ZodType) {
     try {
       return this.schema.parse(value);
