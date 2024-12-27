@@ -9,11 +9,13 @@ import { UserEntity } from './user.entity';
 import { UsersRepository } from './users.repository';
 import { SignUp, GetUserById, SignIn } from './schemas/schemas.type';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: UsersRepository,
+    private jwtService: JwtService,
   ) {}
 
   async getUserById(userId: GetUserById): Promise<UserEntity> {
@@ -38,11 +40,14 @@ export class AuthService {
     }
   }
 
-  async signIn({ email, password }: SignIn): Promise<string> {
+  async signIn({ email, password }: SignIn): Promise<{ accessToken: string }> {
     const user = await this.usersRepository.findOne({ where: { email } });
-    const checkPass = await bcrypt.compare(password, user?.password);
-    if (checkPass)
-      return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+    const isPasswordValid = await bcrypt.compare(password, user?.password);
+    if (isPasswordValid) {
+      const payload = { email };
+      const accessToken = this.jwtService.sign(payload);
+      return { accessToken };
+    }
     throw new UnauthorizedException('please check your login credentials');
   }
 }

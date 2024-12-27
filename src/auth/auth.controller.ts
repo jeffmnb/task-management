@@ -37,9 +37,7 @@ export class AuthController {
   @Post('/signin')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(signInSchema))
-  signIn(@Body() input: SignIn) {
-    console.log(input);
-
+  signIn(@Body() input: SignIn): Promise<{ accessToken: string }> {
     return this.authService.signIn(input);
   }
 }
