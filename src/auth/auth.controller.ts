@@ -10,8 +10,12 @@ import {
 import { AuthService } from './auth.service';
 import { UserEntity } from './user.entity';
 import { ZodValidationPipe } from 'src/utils/zod-validation';
-import { createUserSchema, getUserByIdSchema } from './schemas/schemas';
-import { CreateUser, GetUserById } from './schemas/schemas.type';
+import {
+  signUpSchema,
+  getUserByIdSchema,
+  signInSchema,
+} from './schemas/schemas';
+import { SignUp, GetUserById, SignIn } from './schemas/schemas.type';
 
 @Controller('auth')
 export class AuthController {
@@ -23,10 +27,19 @@ export class AuthController {
     return this.authService.getUserById(userId);
   }
 
-  @Post('/create')
+  @Post('/signup')
   @HttpCode(201)
-  @UsePipes(new ZodValidationPipe(createUserSchema))
-  createUser(@Body() { email, password }: CreateUser) {
-    return this.authService.createUser({ email, password });
+  @UsePipes(new ZodValidationPipe(signUpSchema))
+  signUp(@Body() input: SignUp) {
+    return this.authService.signUp(input);
+  }
+
+  @Post('/signin')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(signInSchema))
+  signIn(@Body() input: SignIn) {
+    console.log(input);
+
+    return this.authService.signIn(input);
   }
 }
