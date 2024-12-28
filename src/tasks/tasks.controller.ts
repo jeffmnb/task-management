@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
@@ -30,8 +31,10 @@ import {
 } from './schema/schema';
 import { UnifiedRequestData } from 'src/decorators/unified-request-data';
 import { TaskEntity } from './task.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
