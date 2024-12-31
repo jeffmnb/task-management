@@ -14,4 +14,7 @@ export class TaskEntity {
 
   @Column()
   status: TaskStatus;
+
+  @Column()
+  userId: string;
 }

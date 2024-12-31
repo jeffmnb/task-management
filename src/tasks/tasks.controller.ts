@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -32,6 +33,7 @@ import {
 import { UnifiedRequestData } from 'src/decorators/unified-request-data';
 import { TaskEntity } from './task.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { UserEntity } from 'src/auth/user.entity';
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
@@ -39,8 +41,8 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  getAllTasks(): Promise<TaskEntity[]> {
-    return this.tasksService.getAllTasks();
+  getAllTasks(@Req() { user }: { user: UserEntity }): Promise<TaskEntity[]> {
+    return this.tasksService.getAllTasks(user);
   }
 
   @Get('/id/:id')
@@ -54,8 +56,9 @@ export class TasksController {
   @UsePipes(new ZodValidationPipe(createNewTaskSchema))
   createNewTask(
     @Body() createNewTaskInput: CreateNewTask,
+    @Req() { user }: { user: UserEntity },
   ): Promise<TaskEntity> {
-    return this.tasksService.createNewTask(createNewTaskInput);
+    return this.tasksService.createNewTask(createNewTaskInput, user);
   }
 
   @Delete('/id/:id')

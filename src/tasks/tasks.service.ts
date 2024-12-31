@@ -6,6 +6,7 @@ import { TaskEntity } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchTaskByQuery, UpdateTaskStatus } from './schema/schema.types';
 import { ILike } from 'typeorm';
+import { UserEntity } from 'src/auth/user.entity';
 
 @Injectable()
 export class TasksService {
@@ -14,8 +15,10 @@ export class TasksService {
     private tasksRepository: TasksRepository,
   ) {}
 
-  async getAllTasks(): Promise<TaskEntity[]> {
-    const allTasks = await this.tasksRepository.find();
+  async getAllTasks(user: UserEntity): Promise<TaskEntity[]> {
+    const allTasks = await this.tasksRepository.find({
+      where: { userId: user?.id },
+    });
     if (!allTasks?.length) throw new NotFoundException('Not found any Tasks');
     return allTasks;
   }
@@ -28,6 +31,7 @@ export class TasksService {
 
   async createNewTask(
     createNewTaskInput: Partial<TaskEntity>,
+    user: UserEntity,
   ): Promise<TaskEntity> {
     const { title, description } = createNewTaskInput;
     const task = this.tasksRepository.create({
@@ -35,6 +39,7 @@ export class TasksService {
       title,
       description,
       status: TaskStatus.OPEN,
+      userId: user?.id,
     });
     await this.tasksRepository.save(task);
     return task;

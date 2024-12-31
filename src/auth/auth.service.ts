@@ -42,6 +42,7 @@ export class AuthService {
 
   async signIn({ email, password }: SignIn): Promise<{ accessToken: string }> {
     const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) throw new NotFoundException(`User not found.`);
     const isPasswordValid = await bcrypt.compare(password, user?.password);
     if (isPasswordValid) {
       const payload = { email };
