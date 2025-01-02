@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TaskStatus } from './tasks.types';
 import { v4 as uuid } from 'uuid';
 import { TasksRepository } from './tasks.repository';
 import { TaskEntity } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SearchTaskByQuery, UpdateTaskStatus } from './schema/schema.types';
+import { SearchTaskByQuery, UpdateTaskStatus } from './schemas/schemas.types';
 import { ILike } from 'typeorm';
 import { UserEntity } from 'src/auth/user.entity';
 
@@ -23,10 +27,17 @@ export class TasksService {
     return allTasks;
   }
 
-  async getTaskById(taskId: string): Promise<TaskEntity> {
-    const task = await this.tasksRepository.findOne({ where: { id: taskId } });
-    if (!task) throw new NotFoundException(`Task with ID ${taskId} not found.`);
-    return task;
+  async getTaskById({
+    id,
+    user,
+  }: {
+    id: string;
+    user?: UserEntity;
+  }): Promise<TaskEntity> {
+    const task = await this.tasksRepository.findOne({ where: { id } });
+    if (!task) throw new NotFoundException(`Task with ID ${id} not found.`);
+    if (task?.userId === user?.id) return task;
+    throw new ForbiddenException(`You don't have permission`);
   }
 
   async createNewTask(
@@ -45,8 +56,14 @@ export class TasksService {
     return task;
   }
 
-  async deleteTaskById(id: string): Promise<void> {
-    const taskExist = await this.getTaskById(id);
+  async deleteTaskById({
+    id,
+    user,
+  }: {
+    id: string;
+    user: UserEntity;
+  }): Promise<void> {
+    const taskExist = await this.getTaskById({ id, user });
     if (!taskExist) throw new NotFoundException(`Task with ID ${id} not found`);
     await this.tasksRepository.delete(id);
   }
@@ -54,25 +71,27 @@ export class TasksService {
   async updateTaskStatus({
     status,
     id,
+    user,
   }: UpdateTaskStatus): Promise<TaskEntity> {
-    const task = await this.getTaskById(id);
+    const task = await this.getTaskById({ id, user });
     task.status = status;
     await this.tasksRepository.save(task);
     return task;
   }
 
-  async searchTask(query: string) {
+  async searchTask({ query, user }: { query: string; user: UserEntity }) {
     return await this.tasksRepository.find({
-      where: { title: ILike(`%${query}%`) },
+      where: { title: ILike(`%${query}%`), userId: user?.id },
     });
   }
 
   async searchTaskByQuery({
     query,
     status,
+    user,
   }: SearchTaskByQuery): Promise<TaskEntity[]> {
     return await this.tasksRepository.find({
-      where: { title: ILike(`%${query}%`), status }, // ANOTAR ILIKE
+      where: { title: ILike(`%${query}%`), status, userId: user?.id },
     });
   }
 }

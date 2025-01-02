@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { TaskStatus } from '../tasks.types';
+import { UserEntity } from 'src/auth/user.entity';
 
 export const createNewTaskSchema = z.object({
   title: z.string().min(5),
@@ -13,6 +14,7 @@ export const deleteTaskByIdSchema = z.string().uuid();
 export const updateTaskStatusSchema = z.object({
   id: z.string().uuid().optional(),
   status: z.nativeEnum(TaskStatus).optional(),
+  user: z.instanceof(UserEntity).optional(),
 });
 
 export const searchTaskByParamSchema = z.object({
@@ -22,4 +24,5 @@ export const searchTaskByParamSchema = z.object({
 export const searchTaskByQuerySchema = z.object({
   query: z.string().min(3),
   status: z.nativeEnum(TaskStatus),
+  user: z.instanceof(UserEntity).optional(),
 });

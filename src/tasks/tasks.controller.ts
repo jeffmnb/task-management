@@ -21,7 +21,7 @@ import {
   SearchTaskByParam,
   SearchTaskByQuery,
   UpdateTaskStatus,
-} from './schema/schema.types';
+} from './schemas/schemas.types';
 import {
   createNewTaskSchema,
   deleteTaskByIdSchema,
@@ -29,7 +29,7 @@ import {
   searchTaskByParamSchema,
   searchTaskByQuerySchema,
   updateTaskStatusSchema,
-} from './schema/schema';
+} from './schemas/schemas';
 import { UnifiedRequestData } from 'src/decorators/unified-request-data';
 import { TaskEntity } from './task.entity';
 import { AuthGuard } from '@nestjs/passport';
@@ -47,8 +47,11 @@ export class TasksController {
 
   @Get('/id/:id')
   @UsePipes(new ZodValidationPipe(getTaskByIdSchema))
-  getTaskById(@Param('id') id: GetTaskById): Promise<TaskEntity> {
-    return this.tasksService.getTaskById(id);
+  getTaskById(
+    @Param('id') id: GetTaskById,
+    @Req() { user }: { user: UserEntity },
+  ): Promise<TaskEntity> {
+    return this.tasksService.getTaskById({ id, user });
   }
 
   @Post()
@@ -63,31 +66,37 @@ export class TasksController {
 
   @Delete('/id/:id')
   @UsePipes(new ZodValidationPipe(deleteTaskByIdSchema))
-  deleteTaskById(@Param('id') id: DeleteTaskById): Promise<void> {
-    return this.tasksService.deleteTaskById(id);
+  deleteTaskById(
+    @Param('id') id: DeleteTaskById,
+    @Req() { user }: { user: UserEntity },
+  ): Promise<void> {
+    return this.tasksService.deleteTaskById({ id, user });
   }
 
   @Patch('/id/:id/status')
   @UsePipes(new ZodValidationPipe(updateTaskStatusSchema))
   updateTaskStatus(
     @UnifiedRequestData() { id, status }: UpdateTaskStatus,
+    @Req() { user }: { user: UserEntity },
   ): Promise<TaskEntity> {
-    return this.tasksService.updateTaskStatus({ id, status });
+    return this.tasksService.updateTaskStatus({ id, status, user });
   }
 
   @Get('/search/:query')
   @UsePipes(new ZodValidationPipe(searchTaskByParamSchema))
   searchTaskByParam(
     @Param() { query }: SearchTaskByParam,
+    @Req() { user }: { user: UserEntity },
   ): Promise<TaskEntity[]> {
-    return this.tasksService.searchTask(query);
+    return this.tasksService.searchTask({ query, user });
   }
 
   @Get('/search')
   @UsePipes(new ZodValidationPipe(searchTaskByQuerySchema))
   searchTaskByQuery(
     @Query() { query, status }: SearchTaskByQuery,
+    @Req() { user }: { user: UserEntity },
   ): Promise<TaskEntity[]> {
-    return this.tasksService.searchTaskByQuery({ query, status });
+    return this.tasksService.searchTaskByQuery({ query, status, user });
   }
 }

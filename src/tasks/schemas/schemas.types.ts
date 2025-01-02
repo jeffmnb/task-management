@@ -6,7 +6,7 @@ import {
   searchTaskByParamSchema,
   searchTaskByQuerySchema,
   updateTaskStatusSchema,
-} from './schema';
+} from './schemas';
 
 export type CreateNewTask = z.infer<typeof createNewTaskSchema>;
 
