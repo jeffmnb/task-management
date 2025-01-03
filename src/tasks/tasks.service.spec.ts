@@ -1,10 +1,10 @@
+import { UserEntity } from '@/auth/user.entity';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TasksService } from '../../src/tasks/tasks.service';
-import { TaskStatus } from '../../src/tasks/tasks.types';
+import { TasksService } from './tasks.service';
+import { TaskEntity } from './task.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { TaskEntity } from '../../src/tasks/task.entity';
-import { UserEntity } from 'src/auth/user.entity';
+import { TaskStatus } from './tasks.types';
 
 const mockTasksRepository = {
   find: jest.fn(),

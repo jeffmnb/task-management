@@ -9,13 +9,13 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserEntity } from './user.entity';
-import { ZodValidationPipe } from 'src/utils/zod-validation';
 import {
   signUpSchema,
   getUserByIdSchema,
   signInSchema,
 } from './schemas/schemas';
 import { SignUp, GetUserById, SignIn } from './schemas/schemas.type';
+import { ZodValidationPipe } from '@/utils/zod-validation';
 
 @Controller('auth')
 export class AuthController {

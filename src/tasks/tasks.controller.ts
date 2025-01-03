@@ -13,7 +13,6 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { ZodValidationPipe } from 'src/utils/zod-validation';
 import {
   CreateNewTask,
   DeleteTaskById,
@@ -30,10 +29,11 @@ import {
   searchTaskByQuerySchema,
   updateTaskStatusSchema,
 } from './schemas/schemas';
-import { UnifiedRequestData } from 'src/decorators/unified-request-data';
 import { TaskEntity } from './task.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { UserEntity } from 'src/auth/user.entity';
+import { ZodValidationPipe } from '@/utils/zod-validation';
+import { UserEntity } from '@/auth/user.entity';
+import { UnifiedRequestData } from '@/decorators/unified-request-data';
 
 @Controller('tasks')
 @UseGuards(AuthGuard())

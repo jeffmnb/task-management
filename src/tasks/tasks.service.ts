@@ -10,7 +10,7 @@ import { TaskEntity } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchTaskByQuery, UpdateTaskStatus } from './schemas/schemas.types';
 import { ILike } from 'typeorm';
-import { UserEntity } from 'src/auth/user.entity';
+import { UserEntity } from '@/auth/user.entity';
 
 @Injectable()
 export class TasksService {

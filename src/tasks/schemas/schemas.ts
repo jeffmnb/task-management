@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { TaskStatus } from '../tasks.types';
-import { UserEntity } from 'src/auth/user.entity';
+import { UserEntity } from '@/auth/user.entity';
 
 export const createNewTaskSchema = z.object({
   title: z.string().min(5),
